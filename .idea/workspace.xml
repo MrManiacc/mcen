@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b929a58c-9f81-4e77-9deb-f19a1ea533c2" name="Changes" comment="">
+    <list default="true" id="b929a58c-9f81-4e77-9deb-f19a1ea533c2" name="Changes" comment="Updates before converting to javascript">
       <change beforePath="$PROJECT_DIR$/.gradle/7.5.1/checksums/checksums.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/7.5.1/checksums/checksums.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/7.5.1/checksums/sha1-checksums.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/7.5.1/checksums/sha1-checksums.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/7.5.1/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/7.5.1/executionHistory/executionHistory.bin" afterDir="false" />
@@ -219,6 +219,18 @@
       <option name="presentableId" value="Default" />
       <updated>1679986972658</updated>
     </task>
+    <task id="LOCAL-00001" summary="Updates before converting to javascript">
+      <created>1681797621367</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1681797621367</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Updates before converting to javascript" />
+    <option name="LAST_COMMIT_MESSAGE" value="Updates before converting to javascript" />
   </component>
 </project>
