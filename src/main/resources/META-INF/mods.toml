@@ -1,0 +1,28 @@
+# Make sure this is set to "kotlinforforge"
+modLoader="kotlinforforge"
+# Make sure this is set to the appropriate version range
+loaderVersion="[3,)" # Require at least 3.x
+# License is REQUIRED after 1.16
+license='LGPL'
+
+[[mods]]
+modId="mcen"
+version="${file.jarVersion}"
+displayName="mcen"
+credits="The mcen dev team"
+authors="mcenAuthor"
+description='''
+Example mod that uses Kotlin for Forge.
+'''
+[[dependencies.mcen]]
+    modId="forge"
+    mandatory=true
+    versionRange="[43,)"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.mcen]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.19,1.20)"
+    ordering="NONE"
+    side="BOTH"

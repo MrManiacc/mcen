@@ -1,0 +1,223 @@
+plugins {
+    id 'net.minecraftforge.gradle' version '5.1.+'
+    // Adds the Kotlin Gradle plugin
+    id 'org.jetbrains.kotlin.jvm' version '1.8.0'
+    // OPTIONAL Kotlin Serialization plugin
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.8.0'
+    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
+    id 'idea'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+}
+
+version = '1.0.0'
+group = 'jraynor.mcen'
+archivesBaseName = 'mcen'
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+idea {
+    module {
+        //Exclude directories from being managed, who needs tests and .java code anyway?
+        for (String excludeDirName in [".gitignore", "run", "runGameTests", "out", "logs", "gradle", "gradlew", ".gitattributes", "gradlew.bat", "LICENSE", "README.md", "src/main/java", "src/api/java", "src/test", "src/editor/java"]) {
+            excludeDirs.add(new File(projectDir, excludeDirName))
+        }
+        // Recursively exclude any files with .tokens or .interp extensions under the src directory
+        fileTree(new File(projectDir, "src")).visit { FileVisitDetails details ->
+            if (details.file.isFile() && (details.file.name.endsWith(".tokens") || details.file.name.endsWith(".interp"))) {
+                excludeDirs.add(details.file)
+            }
+        }
+    }
+}
+
+ext {
+    imguiVersion = "1.86.9"
+}
+
+configurations {
+    shade
+    minecraftLibrary.extendsFrom shade
+}
+minecraft {
+    // Change to your preferred mappings
+    mappings channel: 'parchment', version: '2022.11.27-1.19.2'
+    // Add your AccessTransformer
+    // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+
+    runs {
+        client {
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            property 'forge.enabledGameTestNamespaces', 'mcen'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+            mods {
+                mcen {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        server {
+            workingDirectory project.file('run/server')
+
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            property 'forge.enabledGameTestNamespaces', 'mcen'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+            mods {
+                mcen {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        gameTestServer {
+            workingDirectory project.file('run/server')
+
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            property 'forge.enabledGameTestNamespaces', 'mcen'
+
+            mods {
+                mcen {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        data {
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+
+            args '--mod', 'mcen', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources')
+
+
+            mods {
+                mcen {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+
+
+repositories {
+    mavenCentral()
+    maven {
+        name = 'Kotlin for Forge'
+        url = 'https://thedarkcolour.github.io/KotlinForForge/'
+        content { includeGroup "thedarkcolour" }
+    }
+    maven { url = 'https://maven.parchmentmc.org' }
+    maven {
+        // location of the maven that hosts JEI files
+        name = "Progwml6 maven"
+        url = "https://dvs1.progwml6.com/files/maven/"
+    }
+    maven {
+        // location of a maven mirror for JEI files, as a fallback
+        name = "ModMaven"
+        url = "https://modmaven.dev/"
+    }
+    maven {
+        url "https://cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
+    maven { // TOP
+        name 'tterrag maven'
+        url "https://maven.k-4u.nl"
+    }
+    maven {
+        url "https://maven.blakesmods.com"
+    }
+    flatDir {
+        dirs 'libs'
+    }
+}
+
+dependencies {
+
+    // Use the latest version of Minecraft Forge
+    minecraft 'net.minecraftforge:forge:1.19.2-43.2.7'
+    implementation 'thedarkcolour:kotlinforforge:3.11.0'
+    for (target in ["binding", "lwjgl3", "natives-windows", "app", "natives-macos", "natives-linux"])
+        shade("io.github.spair:imgui-java-$target:${project.imguiVersion}") {
+            transitive = false
+        }
+//    runtimeOnly(fg.deobf("blank:quarry-1.19.3:1.6.4r"))
+    shade group: 'org.luaj', name: 'luaj-jse', version: '3.0.1'
+
+    runtimeOnly(fg.deobf("mekanism:Mekanism:1.19.2-10.3.8.477:all"))
+    runtimeOnly(fg.deobf("curse.maven:botania-225643:4371117"))
+    runtimeOnly(fg.deobf("curse.maven:curios-309927:4418021"))
+    runtimeOnly(fg.deobf("curse.maven:patchouli-306770:4031402"))
+    runtimeOnly(fg.deobf("curse.maven:powah_rearchitected-633483:4183078"))
+    runtimeOnly(fg.deobf("curse.maven:cloth_config-348521:3972423"))
+    runtimeOnly(fg.deobf("curse.maven:architectury_api-419699:4384406"))
+    runtimeOnly(fg.deobf("curse.maven:jei-238222:4434397"))
+    runtimeOnly(fg.deobf("curse.maven:configured-457570:4011355"))
+    runtimeOnly(fg.deobf("curse.maven:jade-324717:4433884"))
+    runtimeOnly(fg.deobf("curse.maven:refined_storage-243076:4392788"))
+
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "17"
+}
+
+shadowJar {
+    archiveClassifier = ''
+    configurations = [project.configurations.shade]
+    finalizedBy 'reobfShadowJar'
+}
+
+assemble.dependsOn shadowJar
+
+reobf {
+    shadowJar {}
+}
+jar {
+//    beforeEvaluate {
+//        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+//        configurations.minecraftLibrary.each { dep ->
+//            if (dep.name.contains("imgui") || dep.name.contains("luaj"))
+//                from(project.zipTree(dep)) {
+//                    exclude 'META-INF', 'META-INF/**'
+//                    exclude 'LICENSE'
+//                    // you may exclude other things here if you want, or maybe copy the META-INF
+//                }
+//        }
+//    }
+//    configurations.libraries.each { dep ->
+//        if (dep.name.contains("imgui") || dep.name.contains("luaj"))
+//            from(project.zipTree(dep)) {
+//                exclude 'META-INF', 'META-INF/**'
+//                exclude 'LICENSE'
+//                // you may exclude other things here if you want, or maybe copy the META-INF
+//            }
+//    }
+    manifest {
+        attributes(['Specification-Title'     : "mcen",
+                    'Specification-Vendor'    : "mcensareus",
+                    'Specification-Version'   : "1", // We are version 1 of ourselves
+                    'Implementation-Title'    : project.name,
+                    'Implementation-Version'  : project.version,
+                    'Implementation-Vendor'   : "examplemodsareus",
+                    'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")])
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+}
+
+jar.finalizedBy('reobfJar')
