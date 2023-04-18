@@ -1,10 +1,8 @@
-package mcen.api.api.graph.node
+package mcen.api.graph.node
 
 
-import mcen.Serial
-import mcen.api.api.graph.type.Type
-import mcen.getEnum
-import mcen.putEnum
+import mcen.*
+import mcen.api.graph.type.Type
 import net.minecraft.nbt.CompoundTag
 
 class Edge(
@@ -17,10 +15,15 @@ class Edge(
      */
     val type: Type,
     /**
+     * Any data that you want to store with the node
+     */
+    var userData: Any? = null,
+    /**
      * Checks to see if the given link is valid for this connector
      */
-    private val validateLink: (other: Edge) -> Boolean = { true }
-) : Serial {
+    private val validateLink: (other: Edge) -> Boolean = { true },
+
+    ) : Serial {
     private var linksMap: MutableMap<Int, Int> = HashMap()
     val links: Map<Int, Int> get() = linksMap
     lateinit var parent: Node
@@ -40,7 +43,7 @@ class Edge(
      */
     fun isLinked(): Boolean = linksMap.isNotEmpty()
 
-    inline fun <reified T : Any> links(): List<T> = links.values.mapNotNull { parent.graph.findByPin(it) }.filterIsInstance<T>()
+    fun links(): List<Edge> = links.values.mapNotNull { parent.graph.findByPin(it) }
 
     /**
      * This will validate the connection between the nodes
@@ -75,6 +78,7 @@ class Edge(
         putString("name", name)
         putInt("connector_id", this@Edge.id)
         putEnum("connector_type", connectorType)
+        if (userData != null) putPrimitive("user_data", userData)
         val links = CompoundTag()
         links.putIntArray("linkIds", linksMap.keys.toList())
         links.putIntArray("pinIds", linksMap.values.toList())
@@ -85,6 +89,7 @@ class Edge(
         name = getString("name")
         this@Edge.id = getInt("connector_id")
         connectorType = getEnum("connector_type")
+        if (contains("user_data")) userData = getPrimitive("user_data")
         linksMap.clear()
         val links = getCompound("links")
         val keys = links.getIntArray("linkIds")

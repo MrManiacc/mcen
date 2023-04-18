@@ -1,8 +1,8 @@
 package api.render
 
-import mcen.api.api.graph.node.Edge
-import mcen.api.api.graph.node.Node
-import mcen.api.api.graph.type.Type
+import mcen.api.graph.node.Edge
+import mcen.api.graph.node.Node
+import mcen.api.graph.type.Type
 import imgui.ImGui
 import imgui.ImVec2
 import imgui.extension.imnodes.ImNodes

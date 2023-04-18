@@ -3,30 +3,32 @@ package mcen.gui.viewports
 import imgui.ImGui
 import imgui.extension.imnodes.ImNodes
 import imgui.extension.imnodes.flag.ImNodesMiniMapLocation
-import imgui.flag.ImGuiInputTextFlags
 import imgui.flag.ImGuiMouseButton
 import imgui.type.ImInt
-import mcen.api.api.graph.Graph
-import mcen.api.api.graph.node.Node
-import mcen.api.api.graph.node.Nodes
+import mcen.api.graph.Graph
+import mcen.api.graph.node.Node
+import mcen.api.graph.node.Nodes
 import mcen.content.internal.WorldPos
 import mcen.gui.Renderer
-import kotlin.reflect.full.createInstance
 import kotlin.reflect.full.primaryConstructor
 
 class NodeViewport(worldPos: WorldPos) : Viewport(worldPos, "nodes") {
     private val context = ImNodes.editorContextCreate()
     private val graph: Graph = Graph()
-
+    private val LINK_A = ImInt()
+    private val LINK_B = ImInt()
     private val nodes: Map<String, () -> Node> =
         Nodes::class.nestedClasses.filter { !it.isAbstract }.associate { it.simpleName!! to { it.primaryConstructor!!.call() as Node } }
 
 
-    override fun Renderer.dockspace() {
-        ImNodes.editorContextSet(context)
-        ImNodes.beginNodeEditor()
-        graph.iterate {
+    fun buildSource(): String {
+        val topLevel = graph.findTopLevelStatements()
 
+        return ""
+    }
+
+    private fun renderNodes(): Boolean {
+        graph.iterate {
             ImNodes.beginNode(it.id)
             ImNodes.beginNodeTitleBar()
             ImGui.dummy(50f, 0f)
@@ -49,16 +51,30 @@ class NodeViewport(worldPos: WorldPos) : Viewport(worldPos, "nodes") {
 
             ImNodes.endNode()
         }
-
         graph.links.forEach {
             ImNodes.link(it.key, it.value.first, it.value.second)
         }
-
         val isEditorHovered = ImNodes.isEditorHovered();
 
         ImNodes.miniMap(0.2f, ImNodesMiniMapLocation.BottomRight);
         ImNodes.endNodeEditor()
+        return isEditorHovered
+    }
 
+    private fun renderLinks() {
+        if (ImNodes.isLinkCreated(LINK_A, LINK_B)) {
+            val source = graph.findByOutputId(LINK_A.get())
+            val target = graph.findByInputId(LINK_B.get())
+            if (source != null && target != null && source.parent.id != target.parent.id) {
+                if (source.isValid(target))
+                    graph.link(source, target)
+
+            }
+        }
+    }
+
+
+    private fun renderPopups(isEditorHovered: Boolean) {
         if (ImGui.isMouseClicked(ImGuiMouseButton.Right)) {
             val hoveredNode = ImNodes.getHoveredNode();
             if (hoveredNode != -1) {
@@ -78,11 +94,7 @@ class NodeViewport(worldPos: WorldPos) : Viewport(worldPos, "nodes") {
                 ImGui.endPopup()
             }
         }
-
         if (ImGui.beginPopup("node_editor_context")) {
-//            if(ImGui.inputText("", ImGui.getInputTextState(0), ImGuiInputTextFlags.CallbackAlways)) {
-//
-//            }
             if (ImGui.beginListBox("Nodes", 150f, 250f)) {
                 nodes.forEach {
                     if (ImGui.selectable(it.key)) {
@@ -93,16 +105,16 @@ class NodeViewport(worldPos: WorldPos) : Viewport(worldPos, "nodes") {
                 }
                 ImGui.endListBox()
             }
-            //
-//            if (ImGui.button("Create New Node")) {
-//                val node = graph.addNode(TextNode())
-//                ImNodes.setNodeScreenSpacePos(node.id, ImGui.getMousePosX(), ImGui.getMousePosY())
-//                ImGui.closeCurrentPopup()
-//            }
             ImGui.endPopup()
         }
+    }
 
-
+    override fun Renderer.dockspace() {
+        ImNodes.editorContextSet(context)
+        ImNodes.beginNodeEditor()
+        val isHovered = renderNodes()
+        renderLinks()
+        renderPopups(isHovered)
     }
 
     override fun Renderer.createDock(parentId: ImInt) {

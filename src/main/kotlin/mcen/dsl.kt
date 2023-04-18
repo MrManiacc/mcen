@@ -22,7 +22,7 @@ import net.minecraftforge.server.ServerLifecycleHooks
 import java.util.*
 import java.util.concurrent.CompletableFuture
 
-import mcen.api.api.graph.type.Type
+import mcen.api.graph.type.Type
 import com.mojang.math.Vector3f
 import com.mojang.math.Vector4f
 import net.minecraft.nbt.CompoundTag
@@ -235,15 +235,15 @@ fun CompoundTag.putPrimitive(name: String, value: Any?) = when (value) {
         putEnum("${name}_type", Type.STRING)
         putString("${name}_value", value)
     }
-//    is BlockPos -> {
-//        putEnum("${name}_type", Type.BLOCK_POS)
-//        putBlockPos("${name}_value", value)
-//    }
-//    is Direction -> {
-//        putEnum("${name}_type", Type.BLOCK_FACE)
-//        putEnum("${name}_value", value)
-//    }
-//    else -> putEnum("${name}_type", Type.NULL)//Unsupported
+    is BlockPos -> {
+        putEnum("${name}_type", Type.BLOCK_POS)
+        putBlockPos("${name}_value", value)
+    }
+    is Direction -> {
+        putEnum("${name}_type", Type.BLOCK_FACE)
+        putEnum("${name}_value", value)
+    }
+//    else -> putEnum("${name}_type", Type.ANY)//Unsupported
     else -> {}
 }
 
@@ -253,8 +253,8 @@ fun CompoundTag.getPrimitive(name: String): Any? {
         Type.INT -> getInt("${name}_value")
         Type.FLOAT -> getFloat("${name}_value")
         Type.STRING -> getString("${name}_value")
-//        Type.BLOCK_POS -> getBlockPos("${name}_value")
-//        Type.BLOCK_FACE -> getEnum<Direction>("${name}_value")
+        Type.BLOCK_POS -> getBlockPos("${name}_value")
+        Type.BLOCK_FACE -> getEnum<Direction>("${name}_value")
         else -> null //Null
     }
 }

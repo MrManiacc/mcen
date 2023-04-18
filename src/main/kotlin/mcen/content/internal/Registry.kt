@@ -3,6 +3,7 @@ package mcen.content.internal
 import mcen.content.ControllerScreen
 import mcen.content.ControllerBlock
 import mcen.content.ControllerTile
+import mcen.gui.RenderScreen
 import mcen.registry.*
 import mcen.registry.Registry
 import mcen.registry.net.*
@@ -30,7 +31,7 @@ object Registry : ListenerRegistry() {
         super.register(modId, modBus, forgeBus)
         runWhenOn(Dist.CLIENT) {
             Minecraft.getInstance().tell {
-                ControllerScreen.Renderer.initialize()
+                RenderScreen.Renderer.initialize()
             }
         }
     }

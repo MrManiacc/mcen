@@ -50,7 +50,7 @@ object Renderer {
     }
 
     inline fun codeFont(window: Renderer.() -> Unit) {
-        ImGui.pushFont(ControllerScreen.Renderer.codeFont)
+        ImGui.pushFont(RenderScreen.Renderer.codeFont)
         this.apply(window)
         ImGui.popFont()
     }

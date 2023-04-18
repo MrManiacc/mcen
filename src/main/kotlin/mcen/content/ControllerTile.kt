@@ -53,21 +53,18 @@ class ControllerTile(pos: BlockPos, state: BlockState) : BlockEntity(Registry.Ti
         else super.getCapability(cap, side)
     }
 
-//    init {
-//        Registry.Net.CompileSource.serverListener { compileSource, _ ->
-//            if (compileSource.blockPos == this.blockPos && compileSource.level.location() == level?.dimensionTypeId()?.location()) {
-//                compileSource(compileSource.source)
-//                false
-//            } else false
-//        }
-//    }
-
+    /**
+     * Compiles the given source code and updates the block
+     */
     fun compileSource(luaSource: String) {
         this.scriptSource = luaSource
         update()
         level?.let { scriptEngine.compile(blockPos, it, luaSource) }
     }
 
+    /**
+     * Updates the block state sends the update to the client
+     */
     fun update() {
         requestModelDataUpdate()
         setChanged()
@@ -77,17 +74,11 @@ class ControllerTile(pos: BlockPos, state: BlockState) : BlockEntity(Registry.Ti
         }
     }
 
-    override fun onLoad() {
-        super.onLoad()
-    }
+    /**
+     * Called every tick to update the script engine
+     */
+    fun tick() = level?.let { scriptEngine.update(blockPos, it) }
 
-    override fun onChunkUnloaded() {
-        super.onChunkUnloaded()
-    }
-
-    fun tick() {
-        level?.let { scriptEngine.update(blockPos, it) }
-    }
 
     override fun saveAdditional(tag: CompoundTag) {
         super.saveAdditional(tag)
@@ -105,13 +96,11 @@ class ControllerTile(pos: BlockPos, state: BlockState) : BlockEntity(Registry.Ti
         level?.let { if (!it.isClientSide) scriptEngine.compile(blockPos, it, scriptSource) }
     }
 
-    override fun getUpdatePacket(): Packet<ClientGamePacketListener>? {
-        return ClientboundBlockEntityDataPacket.create(this)
-    }
+    override fun getUpdatePacket(): Packet<ClientGamePacketListener>? = ClientboundBlockEntityDataPacket.create(this)
 
-    override fun getUpdateTag(): CompoundTag {
-        return serializeNBT()
-    }
+
+    override fun getUpdateTag(): CompoundTag = serializeNBT()
+
 
     override fun handleUpdateTag(tag: CompoundTag) {
         super.handleUpdateTag(tag)

@@ -4,6 +4,7 @@ import imgui.ImGui
 import imgui.flag.ImGuiCol
 import imgui.flag.ImGuiDir
 import imgui.flag.ImGuiWindowFlags
+import imgui.type.ImBoolean
 import imgui.type.ImInt
 import mcen.content.ControllerScreen
 import mcen.content.internal.Registry
@@ -20,6 +21,7 @@ import org.luaj.vm2.parser.TokenMgrError
 
 class ConsoleViewport(worldPos: WorldPos) : Viewport(worldPos, "console") {
     private var updated = false
+    private val compileGraph = ImBoolean(true)
 
     init {
         Registry.Console.addCallback(worldPos) {
@@ -59,7 +61,11 @@ class ConsoleViewport(worldPos: WorldPos) : Viewport(worldPos, "console") {
         }
 //        menuBar {
         ImGui.pushStyleColor(ImGuiCol.Button, 45, 46, 46, 255)
+        ImGui.checkbox("Compile node graph", compileGraph)
         if (ImGui.button("Compile ${Icons.Sun}")) {
+            //Send the compile node source delegation to the node viewport
+            if (compileGraph.get()) scripts.editor.text = getViewport<NodeViewport>()?.buildSource() ?: scripts.editor.text
+
             if (parseScript(scripts.editor.text)) {
                 scripts.errors.clear()
                 Registry.Net.sendToServer(CompileSource(worldPos.position, worldPos.world, scripts.editor.text))

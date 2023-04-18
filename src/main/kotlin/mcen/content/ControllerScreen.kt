@@ -21,58 +21,36 @@ import org.luaj.vm2.parser.ParseException
 import org.luaj.vm2.parser.TokenMgrError
 import org.lwjgl.system.Platform
 
-
-class ControllerScreen(private val level: Level, private val blockPos: BlockPos, private val controllerTile: ControllerTile) :
-    RenderScreen(Renderer) {
+/**
+ * This is the screen that that renders the viewports containing the code and node editor for the controller block.
+ */
+class ControllerScreen(level: Level, blockPos: BlockPos, private val controllerTile: ControllerTile) : RenderScreen() {
+    // stores the current world position of the controller
     private val worldPos = WorldPos(blockPos, level.dimension())
-    private val viewports = Dockspace(arrayListOf(ScriptViewport(worldPos).apply {
-        editor.textLines = controllerTile.scriptSource.trimIndent().split("\n").toTypedArray()
-    },NodeViewport(worldPos), ConsoleViewport(worldPos)), MenubarViewport(worldPos))
 
-
-    override fun onClose() {
-        super.onClose()
-        viewports.onClose()
-    }
+    //provides a reference to all the active viewports within the controller screen
+    private val viewports = Dockspace(
+        arrayListOf(
+            ScriptViewport(worldPos).apply {
+                //Make sure to reset the text to what text is stored within the controller tile upon opening the screen
+                editor.textLines = controllerTile.scriptSource.trimIndent().split("\n").toTypedArray()
+            }, NodeViewport(worldPos), ConsoleViewport(worldPos)
+        ), MenubarViewport(worldPos)
+    )
 
     /**
-     * Renders our frame
+     * Renders our frame containing the dockspace.
      */
     override fun Renderer.render() {
         dockspace("mainview", viewports)
     }
 
-
-    override fun renderToBuffer(stack: PoseStack) {
-        renderInventory(controllerTile.inventory, stack)
+    /**
+     * Callback to close the viewports guis states
+     */
+    override fun onClose() {
+        super.onClose()
+        viewports.onClose()
     }
 
-    private fun Renderer.renderBrowser() {
-
-        ImGui.image(super.targetId, 512f, 400f, 0f, 1f, 1f, 0f)
-
-//        text("${Icons.HandPointRight} todo soon")
-//        folderNode("Project", {
-//            editor.text = "local blockpos = $blockPos\n\n"
-//        }, {}) {
-//            folderNode("Project", {}, {}) {
-//            }
-//        }
-    }
-
-
-    companion object {
-
-        /**
-         * Stores our imgui renderer, an initializes the backend upon loading completion on the clietn
-         */
-        val Renderer = RenderContext(object : RendererBackend {
-            override val windowHandle: Long
-                get() = Minecraft.getInstance().window.window
-            override val glslVersion: String
-                get() = if (Platform.get() != Platform.MACOSX) "#version 120" else "#version 410"
-        })
-
-
-    }
 }

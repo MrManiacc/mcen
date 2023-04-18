@@ -1,7 +1,7 @@
-package mcen.api.api.graph.node
+package mcen.api.graph.node
 
 import mcen.Serial
-import mcen.api.api.graph.Graph
+import mcen.api.graph.Graph
 import net.minecraft.nbt.CompoundTag
 import java.util.function.Supplier
 import kotlin.properties.ReadOnlyProperty
@@ -56,7 +56,6 @@ abstract class Node(val name: String) : Serial {
     }
 
     override fun serializeNBT(): CompoundTag =
-
         with(super.serializeNBT()) {
             inputs.forEach {
                 put("input_${it.id}", it.serializeNBT())
@@ -78,7 +77,6 @@ abstract class Node(val name: String) : Serial {
                 it.deserializeNBT(getCompound("output_${it.id}"))
             }
             this@Node.id = getInt("nodeId")
-
         }
     }
 

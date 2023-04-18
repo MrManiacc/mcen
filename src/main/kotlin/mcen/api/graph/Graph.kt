@@ -1,8 +1,9 @@
-package mcen.api.api.graph
+package mcen.api.graph
 
 import mcen.Serial
-import mcen.api.api.graph.node.Edge
-import mcen.api.api.graph.node.Node
+import mcen.api.graph.node.Edge
+import mcen.api.graph.node.Node
+import mcen.api.graph.node.Nodes
 import mcen.getDeepList
 import mcen.putDeepList
 import net.minecraft.nbt.CompoundTag
@@ -39,13 +40,6 @@ class Graph() : Serial {
         else inputToNode[pin.id] = pin
     }
 
-//    internal fun findFunction(name: String): FunctionNode? {
-//        for (node in nodes.filterIsInstance<FunctionNode>()) {
-//            if ((node.NameIn.value as String) == name) return node
-//        }
-//        return null
-//    }
-
 
     fun addNode(node: Node): Node {
         node.graph = this
@@ -55,6 +49,8 @@ class Graph() : Serial {
         nodeMap[node.id] = node
         return node
     }
+
+    fun findTopLevelStatements() = nodeMap.filterValues { it is Nodes.StatementNode && it.inputs.isEmpty() }.values
 
     fun link(input: Edge, output: Edge, linkId: Int = ++nextLinkId) {
         if (!input.linkTo(output, linkId)) return
