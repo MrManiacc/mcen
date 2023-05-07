@@ -1,6 +1,5 @@
 package mcen.content.internal
 
-import mcen.content.ControllerScreen
 import mcen.content.ControllerBlock
 import mcen.content.ControllerTile
 import mcen.gui.RenderScreen
@@ -24,7 +23,6 @@ import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent
 import net.minecraftforge.registries.ForgeRegistries
 import net.minecraftforge.server.ServerLifecycleHooks
 import thedarkcolour.kotlinforforge.forge.runWhenOn
-import java.util.*
 
 object Registry : ListenerRegistry() {
     override fun register(modId: String, modBus: IEventBus, forgeBus: IEventBus) {
@@ -44,6 +42,7 @@ object Registry : ListenerRegistry() {
         val CompileSource by register(1) { CompileSource() }
         val ConsoleMessage by register(2) { ConsoleMessagePacket() }
         val ConsoleError by register(3) { ConsoleErrorPacket() }
+        val SyncWorkspace by register(4) { SyncWorkspacePacket() }
     }
 
     /**
@@ -58,7 +57,12 @@ object Registry : ListenerRegistry() {
      */
     object Items : Registry<Item>(ForgeRegistries.ITEMS) {
         //        val Tab: CreativeModeTab = CreativeModeTab.builder(CreativeModeTab.Row.TOP, 10).title(Component.literal("Mcen")).build()
-        val Controller: Item by register("controller") { BlockItem(Blocks.Controller, Item.Properties().fireResistant().stacksTo(1)) }
+        val Controller: Item by register("controller") {
+            BlockItem(
+                Blocks.Controller,
+                Item.Properties().fireResistant().stacksTo(1)
+            )
+        }
     }
 
     object Blocks : Registry<Block>(ForgeRegistries.BLOCKS) {
@@ -71,10 +75,20 @@ object Registry : ListenerRegistry() {
         fun onLoadComplete(event: ServerStartedEvent) {
             runOnServer {
                 Net.CompileSource.serverListener { compileSource, _ ->
-                    val level = ServerLifecycleHooks.getCurrentServer().getLevel(compileSource.level) ?: return@serverListener false
+                    val level = ServerLifecycleHooks.getCurrentServer().getLevel(compileSource.level)
+                        ?: return@serverListener false
                     val entity = level.getBlockEntity(compileSource.blockPos)
                     return@serverListener if (entity is ControllerTile) {
                         entity.compileSource(compileSource.source)
+                        true
+                    } else false
+                }
+                Net.SyncWorkspace.serverListener { compileSource, _ ->
+                    val level = ServerLifecycleHooks.getCurrentServer().getLevel(compileSource.world)
+                        ?: return@serverListener false
+                    val entity = level.getBlockEntity(compileSource.blockPos)
+                    return@serverListener if (entity is ControllerTile) {
+                        entity.workspace.deserializeNBT(compileSource.workspace.serializeNBT())
                         true
                     } else false
                 }
@@ -119,7 +133,9 @@ object Registry : ListenerRegistry() {
         /**
          * Gets the messages for the given world position
          */
-        fun getMessages(worldPos: WorldPos): MutableList<Pair<LogLevel, String>> = messages.getOrPut(worldPos) { arrayListOf() }
+        fun getMessages(worldPos: WorldPos): MutableList<Pair<LogLevel, String>> =
+            messages.getOrPut(worldPos) { arrayListOf() }
+
         fun getErrors(worldPos: WorldPos): MutableMap<Int, String> = errors.getOrPut(worldPos) { hashMapOf() }
 
     }

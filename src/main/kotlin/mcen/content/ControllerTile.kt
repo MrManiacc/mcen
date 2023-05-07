@@ -1,5 +1,6 @@
 package mcen.content
 
+import mcen.api.workspace.Workspace
 import mcen.content.internal.Registry
 import mcen.scripting.ScriptEngine
 import net.minecraft.core.BlockPos
@@ -20,6 +21,7 @@ import net.minecraftforge.items.ItemStackHandler
 
 class ControllerTile(pos: BlockPos, state: BlockState) : BlockEntity(Registry.Tiles.Controller, pos, state) {
     private val scriptEngine = ScriptEngine()
+    val workspace = Workspace()
     var scriptSource: String = ""
     private val inventoryOptional = LazyOptional.of { inventory }
     private val energyOptional = LazyOptional.of { energy }
@@ -59,7 +61,7 @@ class ControllerTile(pos: BlockPos, state: BlockState) : BlockEntity(Registry.Ti
     fun compileSource(luaSource: String) {
         this.scriptSource = luaSource
         update()
-        level?.let { scriptEngine.compile(blockPos, it, luaSource) }
+        level?.let { scriptEngine.compile(blockPos, it, luaSource, workspace) }
     }
 
     /**
@@ -85,6 +87,7 @@ class ControllerTile(pos: BlockPos, state: BlockState) : BlockEntity(Registry.Ti
         tag.putString("script", scriptSource)
         tag.put("inventory", inventory.serializeNBT())
         tag.put("energy", energy.serializeNBT())
+        tag.put("workspace", workspace.serializeNBT())
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -93,7 +96,8 @@ class ControllerTile(pos: BlockPos, state: BlockState) : BlockEntity(Registry.Ti
         scriptSource = tag.getString("script")
         inventory.deserializeNBT(tag.getCompound("inventory"))
         energy.deserializeNBT(tag.get("energy"))
-        level?.let { if (!it.isClientSide) scriptEngine.compile(blockPos, it, scriptSource) }
+        workspace.deserializeNBT(tag.getCompound("workspace"))
+        level?.let { if (!it.isClientSide) scriptEngine.compile(blockPos, it, scriptSource, workspace) }
     }
 
     override fun getUpdatePacket(): Packet<ClientGamePacketListener>? = ClientboundBlockEntityDataPacket.create(this)

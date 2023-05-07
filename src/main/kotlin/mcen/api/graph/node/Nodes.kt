@@ -5,71 +5,71 @@ import net.minecraft.core.BlockPos
 
 object Nodes {
 
-
-    class TextNode : PrimitiveNode("Text Node") {
-        val Value: Edge by output(Edge("Text", Type.STRING, "text") { it.isValid(Value) })
-        override fun toString(): String {
-            return "local ${Value.name.lowercase()}_${Value.id} = ${Value.userData}"
-        }
-    }
-
-    class FloatNode : PrimitiveNode("Float Node") {
-        val Value: Edge by output(Edge("Number", Type.FLOAT, 0.0f) { it.isValid(Value) })
-        override fun toString(): String {
-            return "local ${Value.name.lowercase()}_${Value.id} = ${Value.userData}"
-        }
-    }
-
-    class IntNode : PrimitiveNode("Int Node") {
-        val Value: Edge by output(Edge("Int", Type.INT, 0) { it.isValid(Value) })
-        override fun toString(): String {
-            return "local ${Value.name.lowercase()}_${Value.id} = ${Value.userData}"
-        }
-    }
-
-    class BooleanNode : PrimitiveNode("Boolean Node") {
-        val Value: Edge by output(Edge("Boolean", Type.BOOLEAN, true) { it.isValid(Value) })
-        override fun toString(): String {
-            return "local ${Value.name.lowercase()}_${Value.id} = ${Value.userData}"
-        }
-    }
-
-    class BlockPosNode : PrimitiveNode("BlockPos Node") {
-        val Value: Edge by output(Edge("BlockPos", Type.BLOCK_POS, BlockPos.ZERO) { it.isValid(Value) })
-        override fun toString(): String {
-            val pos = Value.userData as BlockPos
-            return "local ${Value.name.lowercase()}_${Value.id} = {${pos.x}, ${pos.y}, ${pos.z}}})"
-        }
-    }
-
-    class SelfNode : PrimitiveNode("Self Node") {
-        val Value: Edge by output(Edge("Self", Type.ANY) { it.isValid(Value) })
-    }
-
-    class ConsoleNode : StatementNode("Console Node") {
-        val Info: Edge by input(Edge("Info", Type.ANY) { it.parent is ExpressionNode || it.type == Type.STRING && !Info.isLinked() })
-        val Debug: Edge by input(Edge("Debug", Type.ANY) { it.parent is ExpressionNode || it.type == Type.STRING && !Info.isLinked() })
-        val Warn: Edge by input(Edge("Warn", Type.ANY) { it.parent is ExpressionNode || it.type == Type.STRING && !Info.isLinked() })
-        val Error: Edge by input(Edge("Error", Type.ANY) { it.parent is ExpressionNode || it.type == Type.STRING && !Info.isLinked() })
-
-        override fun toString(): String {
-            val sb = StringBuilder()
-            if (Info.isLinked()) sb.appendLine("Console.info(${Info.links().first().parent})")
-            if (Debug.isLinked()) sb.appendLine("Console.debug(${Debug.links().first().parent})")
-            if (Warn.isLinked()) sb.appendLine("Console.warn(${Warn.links().first().parent})")
-            if (Error.isLinked()) sb.appendLine("Console.error(${Error.links().first().parent})")
-            return sb.toString()
-        }
-    }
-
-    abstract class PrimitiveNode(name: String) : ExpressionNode(name) {
-
-
-    }
-
-    abstract class ExpressionNode(name: String) : StatementNode(name) {}
-
-    abstract class StatementNode(name: String) : Node(name) {}
+//
+//    class TextNode : PrimitiveNode("Text Node") {
+//        val Value: Edge by output(Edge("Text", Type.STRING, "text") { it.isValid(Value) })
+//        override fun toString(): String {
+//            return "local ${Value.name.lowercase()}_${Value.id} = ${Value.userData}"
+//        }
+//    }
+//
+//    class FloatNode : PrimitiveNode("Float Node") {
+//        val Value: Edge by output(Edge("Number", Type.FLOAT, 0.0f) { it.isValid(Value) })
+//        override fun toString(): String {
+//            return "local ${Value.name.lowercase()}_${Value.id} = ${Value.userData}"
+//        }
+//    }
+//
+//    class IntNode : PrimitiveNode("Int Node") {
+//        val Value: Edge by output(Edge("Int", Type.INT, 0) { it.isValid(Value) })
+//        override fun toString(): String {
+//            return "local ${Value.name.lowercase()}_${Value.id} = ${Value.userData}"
+//        }
+//    }
+//
+//    class BooleanNode : PrimitiveNode("Boolean Node") {
+//        val Value: Edge by output(Edge("Boolean", Type.BOOLEAN, true) { it.isValid(Value) })
+//        override fun toString(): String {
+//            return "local ${Value.name.lowercase()}_${Value.id} = ${Value.userData}"
+//        }
+//    }
+//
+//    class BlockPosNode : PrimitiveNode("BlockPos Node") {
+//        val Value: Edge by output(Edge("BlockPos", Type.BLOCK_POS, BlockPos.ZERO) { it.isValid(Value) })
+//        override fun toString(): String {
+//            val pos = Value.userData as BlockPos
+//            return "local ${Value.name.lowercase()}_${Value.id} = {${pos.x}, ${pos.y}, ${pos.z}}})"
+//        }
+//    }
+//
+//    class SelfNode : PrimitiveNode("Self Node") {
+//        val Value: Edge by output(Edge("Self", Type.ANY) { it.isValid(Value) })
+//    }
+//
+//    class ConsoleNode : StatementNode("Console Node") {
+//        val Info: Edge by input(Edge("Info", Type.ANY) { it.parent is ExpressionNode || it.type == Type.STRING && !Info.isLinked() })
+//        val Debug: Edge by input(Edge("Debug", Type.ANY) { it.parent is ExpressionNode || it.type == Type.STRING && !Info.isLinked() })
+//        val Warn: Edge by input(Edge("Warn", Type.ANY) { it.parent is ExpressionNode || it.type == Type.STRING && !Info.isLinked() })
+//        val Error: Edge by input(Edge("Error", Type.ANY) { it.parent is ExpressionNode || it.type == Type.STRING && !Info.isLinked() })
+//
+//        override fun toString(): String {
+//            val sb = StringBuilder()
+//            if (Info.isLinked()) sb.appendLine("Console.info(${Info.links().first().parent})")
+//            if (Debug.isLinked()) sb.appendLine("Console.debug(${Debug.links().first().parent})")
+//            if (Warn.isLinked()) sb.appendLine("Console.warn(${Warn.links().first().parent})")
+//            if (Error.isLinked()) sb.appendLine("Console.error(${Error.links().first().parent})")
+//            return sb.toString()
+//        }
+//    }
+//
+//    abstract class PrimitiveNode(name: String) : ExpressionNode(name) {
+//
+//
+//    }
+//
+//    abstract class ExpressionNode(name: String) : StatementNode(name) {}
+//
+//    abstract class StatementNode(name: String) : Node(name) {}
 //
 //    class AddNode : ExpressionNode("Add") {
 //        val Number1: Edge by input(Edge("Number A", Type.FLOAT) { it.type == Type.FLOAT || it.type == Type.INT })

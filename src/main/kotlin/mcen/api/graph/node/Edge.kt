@@ -22,7 +22,6 @@ class Edge(
      * Checks to see if the given link is valid for this connector
      */
     private val validateLink: (other: Edge) -> Boolean = { true },
-
     ) : Serial {
     private var linksMap: MutableMap<Int, Int> = HashMap()
     val links: Map<Int, Int> get() = linksMap
@@ -43,7 +42,7 @@ class Edge(
      */
     fun isLinked(): Boolean = linksMap.isNotEmpty()
 
-    fun links(): List<Edge> = links.values.mapNotNull { parent.graph.findByPin(it) }
+    fun links(): List<Edge> = links.values.mapNotNull { parent.graph.findByEdge(it) }
 
     /**
      * This will validate the connection between the nodes
@@ -60,7 +59,7 @@ class Edge(
      * Removes our link regardless of whether or not it's present
      */
     fun unlink() {
-        linksMap.values.map(parent.graph::findByPin).forEach {
+        linksMap.values.map(parent.graph::findByEdge).forEach {
             if (it != null) linksMap.keys.forEach(it::unlink)
         }
         linksMap.clear()

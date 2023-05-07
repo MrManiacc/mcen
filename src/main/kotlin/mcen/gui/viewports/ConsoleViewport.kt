@@ -19,7 +19,7 @@ import org.luaj.vm2.parser.LuaParser
 import org.luaj.vm2.parser.ParseException
 import org.luaj.vm2.parser.TokenMgrError
 
-class ConsoleViewport(worldPos: WorldPos) : Viewport(worldPos, "console") {
+class ConsoleViewport(private val worldPos: WorldPos) : Viewport("console") {
     private var updated = false
     private val compileGraph = ImBoolean(true)
 
@@ -58,19 +58,21 @@ class ConsoleViewport(worldPos: WorldPos) : Viewport(worldPos, "console") {
         val scripts = getViewport<ScriptViewport>() ?: return
         if (scripts.errors.isNotEmpty()) {
             scripts.editor.setErrorMarkers(scripts.errors)
+        }else{
+            scripts.editor.setErrorMarkers(emptyMap())
         }
 //        menuBar {
         ImGui.pushStyleColor(ImGuiCol.Button, 45, 46, 46, 255)
-        ImGui.checkbox("Compile node graph", compileGraph)
-        if (ImGui.button("Compile ${Icons.Sun}")) {
-            //Send the compile node source delegation to the node viewport
-            if (compileGraph.get()) scripts.editor.text = getViewport<NodeViewport>()?.buildSource() ?: scripts.editor.text
-
-            if (parseScript(scripts.editor.text)) {
-                scripts.errors.clear()
-                Registry.Net.sendToServer(CompileSource(worldPos.position, worldPos.world, scripts.editor.text))
-            }
-        }
+//        ImGui.checkbox("Compile node graph", compileGraph)
+////        if (ImGui.button("Compile ${Icons.Sun}")) {
+////            //Send the compile node source delegation to the node viewport
+//////            if (compileGraph.get()) scripts.editor.text = getViewport<NodeViewport>()?.buildSource() ?: scripts.editor.text
+////
+////            if (parseScript(scripts.editor.text)) {
+////                scripts.errors.clear()
+////                Registry.Net.sendToServer(CompileSource(worldPos.position, worldPos.world, scripts.editor.text))
+////            }
+////        }
         ImGui.sameLine()
         if (ImGui.button("Clear ${Icons.HandPointDown}")) {
             scripts.messages.clear()

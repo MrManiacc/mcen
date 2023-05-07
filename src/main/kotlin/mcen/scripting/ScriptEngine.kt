@@ -1,5 +1,7 @@
 package mcen.scripting
 
+import mcen.api.workspace.CustomRequire
+import mcen.api.workspace.Workspace
 import mcen.content.internal.Registry
 import mcen.registry.net.ConsoleErrorPacket
 import mcen.scripting.block.CheckBlockFunc
@@ -109,7 +111,7 @@ class ScriptEngine() {
      * Compiles the script program for the given source and provides the default global environment.
      * This function will save the instance of the update function if it exists
      */
-    fun compile(blockPos: BlockPos, world: Level, script: String): Boolean {
+    fun compile(blockPos: BlockPos, world: Level, script: String, workspace: Workspace): Boolean {
         updateFunction = null
         val globals = JsePlatform.standardGlobals()
         globals.set("Items", Items(world, blockPos))
@@ -119,6 +121,7 @@ class ScriptEngine() {
         globals.set("Console", Console(world, blockPos))
         globals.set("Entity", Entities(world))
         globals.set("Position", Position(world, blockPos))
+        globals.set("require", CustomRequire(workspace, globals))
         val chunk = globals.load(script)
         return try {
             chunk.call()

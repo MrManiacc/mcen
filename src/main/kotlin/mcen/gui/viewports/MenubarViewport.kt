@@ -1,17 +1,40 @@
 package mcen.gui.viewports
 
 import imgui.ImGui
+import imgui.ImVec2
+import imgui.flag.ImGuiCond
+import imgui.flag.ImGuiInputTextFlags
+import imgui.type.ImString
+import mcen.api.workspace.File
+import mcen.api.workspace.Folder
+import mcen.api.workspace.Workspace
+import mcen.content.internal.Registry
 import mcen.content.internal.WorldPos
+import mcen.gui.Icons
 import mcen.gui.Renderer
+import mcen.registry.net.CompileSource
+import mcen.registry.net.SyncWorkspacePacket
+import kotlin.random.Random
 
-class MenubarViewport(worldPos: WorldPos) : Viewport(worldPos, "menubar") {
+class MenubarViewport(private val worldPos: WorldPos) : Viewport("menubar") {
     override fun Renderer.dockspace() {
         val scripts = getViewport<ScriptViewport>() ?: return
+        val explorer = getViewport<ExplorerViewport>() ?: return
+        var action = ""
         mainMenuBar {
+
             menu("File") {
+                menuItem("New", "Ctrl-J") {
+                    action = "new"
+                }
                 menuItem("Save", "Ctrl-S") {
-                    val text = scripts.editor.text
-                    println("SAVING TEXT: \n$text")
+                    if (scripts.activeFile == File.InvalidFile) {
+                        action = "save"
+                    } else {
+                        scripts.activeFile.sourceCode = scripts.editor.text
+                        Registry.Net.sendToServer(SyncWorkspacePacket(explorer.workspace, worldPos.position, worldPos.world))
+                    }
+
                 }
                 menuItem("ReadOnly", "", scripts.editor.isReadOnly) {
                     scripts.editor.isReadOnly = !scripts.editor.isReadOnly
@@ -39,9 +62,43 @@ class MenubarViewport(worldPos: WorldPos) : Viewport(worldPos, "menubar") {
                 }
 
             }
-            menu("Help") {
+            ImGui.sameLine((ImGui.getWindowWidth() / 2) - ImGui.calcTextSize("editing: ${scripts.activeFile.name}.lua").x / 2);
+            ImGui.text("editing: ${scripts.activeFile.name}.lua")
+            ImGui.sameLine(ImGui.getWindowWidth() - 180);
+            if (ImGui.button("Compile ${Icons.Sun}")) {
+                Registry.Net.sendToServer(
+                    SyncWorkspacePacket(
+                        explorer.workspace,
+                        worldPos.position,
+                        worldPos.world
+                    )
+                )
+                scripts.activeFile.sourceCode = scripts.editor.text
+                Registry.Net.sendToServer(
+                    CompileSource(
+                        worldPos.position,
+                        worldPos.world,
+                        scripts.activeFile.sourceCode
+                    )
+                )
+                scripts.errors.clear()
+
+            }
+            ImGui.sameLine()
+            if (ImGui.button("Clear ${Icons.HandPointDown}")) {
+                scripts.messages.clear()
+                scripts.errors.clear()
 
             }
         }
+
+        if (action.isNotBlank()) {
+            ImGui.openPopup("${action}_action")
+            action = ""
+        }
+
+
     }
+
+
 }

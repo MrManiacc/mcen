@@ -34,7 +34,8 @@ class ControllerScreen(level: Level, blockPos: BlockPos, private val controllerT
             ScriptViewport(worldPos).apply {
                 //Make sure to reset the text to what text is stored within the controller tile upon opening the screen
                 editor.textLines = controllerTile.scriptSource.trimIndent().split("\n").toTypedArray()
-            }, NodeViewport(worldPos), ConsoleViewport(worldPos)
+            }, NodeViewport(), ConsoleViewport(worldPos),
+            ExplorerViewport(controllerTile.workspace, worldPos),
         ), MenubarViewport(worldPos)
     )
 

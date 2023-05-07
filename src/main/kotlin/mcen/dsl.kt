@@ -147,6 +147,7 @@ inline fun <reified T : BlockEntity> Registry<BlockEntityType<*>>.tile(
 ): BlockEntityType<T> {
     return BlockEntityType.Builder.of({ pos, state -> supplier(pos to state) }, block).build(null)
 }
+
 /**
  * This will raytrace the given distance for the given player
  */
@@ -168,9 +169,6 @@ fun Player.rayTrace(distance: Double = 75.0): BlockHitResult {
     pos = BlockPos(xm, ym, zm)
     return BlockHitResult(rayTraceResult.location, rayTraceResult.direction, pos, false)
 }
-
-
-
 
 
 interface Serial : INBTSerializable<CompoundTag> {
@@ -223,22 +221,27 @@ fun CompoundTag.putPrimitive(name: String, value: Any?) = when (value) {
         putEnum("${name}_type", Type.BOOLEAN)
         putBoolean("${name}_value", value)
     }
+
     is Int -> {
         putEnum("${name}_type", Type.INT)
         putInt("${name}_value", value)
     }
+
     is Float -> {
         putEnum("${name}_type", Type.FLOAT)
         putFloat("${name}_value", value)
     }
+
     is String -> {
         putEnum("${name}_type", Type.STRING)
         putString("${name}_value", value)
     }
+
     is BlockPos -> {
         putEnum("${name}_type", Type.BLOCK_POS)
         putBlockPos("${name}_value", value)
     }
+
     is Direction -> {
         putEnum("${name}_type", Type.BLOCK_FACE)
         putEnum("${name}_value", value)
@@ -316,6 +319,76 @@ inline fun <reified T : INBTSerializable<CompoundTag>> CompoundTag.getDeepList(n
         val clazz = tag.getClass("c_$i")
         if (T::class.java.isAssignableFrom(clazz)) list.add((clazz.newInstance() as T).apply { deserializeNBT(value) })
     }
+}
+
+/** This will read a map of the given type. **/
+inline fun <reified K : INBTSerializable<CompoundTag>, reified V : INBTSerializable<CompoundTag>> CompoundTag.getMap(
+    name: String
+): Map<K, V> {
+    val tag = this.getCompound("${name}_map") ?: return emptyMap()
+    val size = this.getInt("${name}_map_size")
+    val map = HashMap<K, V>()
+    for (i in 0 until size) {
+        val key = tag.getCompound("k_$i") ?: continue
+        val value = tag.getCompound("v_$i") ?: continue
+        val keyClass = tag.getClass("k_class_$i")
+        val valueClass = tag.getClass("v_class_$i")
+        val keyInstance = (keyClass.newInstance() as K).apply { deserializeNBT(key) }
+        val valueInstance = (valueClass.newInstance() as V).apply { deserializeNBT(value) }
+        map[keyInstance] = valueInstance
+    }
+    return map
+}
+
+/** This will write the given map into the compound. **/
+inline fun <reified K : INBTSerializable<CompoundTag>, reified V : INBTSerializable<CompoundTag>> CompoundTag.putMap(
+    name: String,
+    map: Map<K, V>
+): CompoundTag {
+    val tag = CompoundTag()
+    this.putInt("${name}_map_size", map.size)
+    map.entries.forEachIndexed { i, (key: K, value: V) ->
+        tag.putClass("k_class_$i", key::class.java)
+        tag.put("k_$i", key.serializeNBT())
+        tag.putClass("v_class_$i", value::class.java)
+        tag.put("v_$i", value.serializeNBT())
+    }
+    this.put("${name}_map", tag)
+    return this
+}
+
+
+/** This will write the given map with String keys into the compound. **/
+inline fun <reified V : INBTSerializable<CompoundTag>> CompoundTag.putStringKeyMap(
+    name: String,
+    map: Map<String, V>
+): CompoundTag {
+    val tag = CompoundTag()
+    this.putInt("${name}_map_size", map.size)
+    map.entries.forEachIndexed { i, (key, value) ->
+        tag.putString("k_$i", key)
+        tag.putClass("v_class_$i", value::class.java)
+        tag.put("v_$i", value.serializeNBT())
+    }
+    this.put("${name}_map", tag)
+    return this
+}
+
+/** This will read a map with String keys of the given value type. **/
+inline fun <reified V : INBTSerializable<CompoundTag>> CompoundTag.getStringKeyMap(name: String): Map<String, V> {
+    val map = mutableMapOf<String, V>()
+    val tag = this.getCompound("${name}_map") ?: return emptyMap()
+    val size = this.getInt("${name}_map_size")
+    for (i in 0 until size) {
+        val key = tag.getString("k_$i")
+        val valueTag = tag.getCompound("v_$i") ?: continue
+        val valueClass = tag.getClass("v_class_$i")
+        if (V::class.java.isAssignableFrom(valueClass)) {
+            val value = (valueClass.newInstance() as V).apply { deserializeNBT(valueTag) }
+            map[key] = value
+        }
+    }
+    return map
 }
 
 /**

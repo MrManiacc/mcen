@@ -12,7 +12,7 @@ import mcen.content.internal.WorldPos
 import mcen.gui.Renderer
 import kotlin.reflect.full.primaryConstructor
 
-class NodeViewport(worldPos: WorldPos) : Viewport(worldPos, "nodes") {
+class NodeViewport() : Viewport( "Node Editor") {
     private val context = ImNodes.editorContextCreate()
     private val graph: Graph = Graph()
     private val LINK_A = ImInt()
@@ -22,8 +22,6 @@ class NodeViewport(worldPos: WorldPos) : Viewport(worldPos, "nodes") {
 
 
     fun buildSource(): String {
-        val topLevel = graph.findTopLevelStatements()
-
         return ""
     }
 
@@ -63,8 +61,8 @@ class NodeViewport(worldPos: WorldPos) : Viewport(worldPos, "nodes") {
 
     private fun renderLinks() {
         if (ImNodes.isLinkCreated(LINK_A, LINK_B)) {
-            val source = graph.findByOutputId(LINK_A.get())
-            val target = graph.findByInputId(LINK_B.get())
+            val source = graph.findByOutputID(LINK_A.get())
+            val target = graph.findByInputID(LINK_B.get())
             if (source != null && target != null && source.parent.id != target.parent.id) {
                 if (source.isValid(target))
                     graph.link(source, target)
@@ -87,7 +85,7 @@ class NodeViewport(worldPos: WorldPos) : Viewport(worldPos, "nodes") {
         if (ImGui.isPopupOpen("node_context")) {
             val targetNode = ImGui.getStateStorage().getInt(ImGui.getID("delete_node_id"))
             if (ImGui.beginPopup("node_context")) {
-                if (ImGui.button("Delete " + graph.findByNodeId(targetNode)?.name)) {
+                if (ImGui.button("Delete " + graph.findByNodeID(targetNode)?.name)) {
                     graph.removeNode(targetNode)
                     ImGui.closeCurrentPopup()
                 }

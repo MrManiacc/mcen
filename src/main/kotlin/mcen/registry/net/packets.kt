@@ -1,6 +1,7 @@
 package mcen.registry.net
 
 import com.github.sieves.registry.internal.net.Packet
+import mcen.api.workspace.Workspace
 import mcen.scripting.console.LogLevel
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Registry
@@ -77,6 +78,25 @@ class ConsoleErrorPacket(
         blockPos = buffer.readBlockPos()
         world = ResourceKey.create(Registry.DIMENSION_REGISTRY, buffer.readResourceLocation())
         line = buffer.readInt()
+    }
+}
+
+class SyncWorkspacePacket(
+    var workspace: Workspace = Workspace(),
+    var blockPos: BlockPos = BlockPos.ZERO,
+    var world: ResourceKey<Level> = Level.OVERWORLD,
+) : Packet() {
+
+    override fun write(buffer: FriendlyByteBuf) {
+        buffer.writeNbt(workspace.serializeNBT())
+        buffer.writeBlockPos(blockPos)
+        buffer.writeResourceLocation(world.location())
+    }
+
+    override fun read(buffer: FriendlyByteBuf) {
+        workspace.deserializeNBT(buffer.readNbt()!!)
+        blockPos = buffer.readBlockPos()
+        world = ResourceKey.create(Registry.DIMENSION_REGISTRY, buffer.readResourceLocation())
     }
 }
 

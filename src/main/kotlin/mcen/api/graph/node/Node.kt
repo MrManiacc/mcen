@@ -7,13 +7,21 @@ import java.util.function.Supplier
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
-abstract class Node(val name: String) : Serial {
+class Node(val name: String) : Serial {
     private val inputEdges: MutableList<Edge> = ArrayList()
     private val outputEdges: MutableList<Edge> = ArrayList()
+
+    //exposes a read only list of the inputs
     val inputs: List<Edge> get() = inputEdges
+
+    //exposes a read only list of the outputs
     val outputs: List<Edge> get() = outputEdges
+
+    //exposes a read only reference to the graph this node is a part of
     lateinit var graph: Graph
         internal set
+
+    //the id of this node in the graph
     var id: Int = -1
         internal set
 

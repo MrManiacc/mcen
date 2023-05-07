@@ -198,6 +198,10 @@ object Renderer {
             ImGui.popStyleVar()
 
         }
+    dockspace.mainViewport.popup()
+        dockspace.viewports.forEach {
+            it.popup()
+        }
     }
 
 //    inline fun dockspace(

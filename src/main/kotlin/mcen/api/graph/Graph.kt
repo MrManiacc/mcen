@@ -3,7 +3,6 @@ package mcen.api.graph
 import mcen.Serial
 import mcen.api.graph.node.Edge
 import mcen.api.graph.node.Node
-import mcen.api.graph.node.Nodes
 import mcen.getDeepList
 import mcen.putDeepList
 import net.minecraft.nbt.CompoundTag
@@ -18,8 +17,8 @@ class Graph() : Serial {
     private val inputToNode: MutableMap<Int, Edge> = HashMap()
     private val outputToNode: MutableMap<Int, Edge> = HashMap()
     private val linkMap: MutableMap<Int, Pair<Int, Int>> = HashMap()
-    private var nextNodeId = 1
-    private var nextPinId = 1_000_000
+    private var nextNodeID = 1
+    private var nextEdgeID = 1_000_000
     private var nextLinkId = 1
     internal val nodes: Collection<Node> get() = nodeMap.values
     internal val links: Map<Int, Pair<Int, Int>> get() = linkMap
@@ -34,23 +33,24 @@ class Graph() : Serial {
         this.meta = null
     }
 
-    private fun addEdge(pin: Edge) {
-        if (pin.id == -1) pin.id = nextPinId++
-        if (pin.connectorType == Edge.ConnectorType.Output) outputToNode[pin.id] = pin
-        else inputToNode[pin.id] = pin
+    fun addEdge(edge: Edge) {
+        if (edge.id == -1) edge.id = nextEdgeID++
+        if (edge.connectorType == Edge.ConnectorType.Output) outputToNode[edge.id] = edge
+        else inputToNode[edge.id] = edge
     }
 
 
     fun addNode(node: Node): Node {
         node.graph = this
-        if (node.id == -1) node.id = nextNodeId++
+        if (node.id == -1) node.id = nextNodeID++
+        //TODO: remove this may cause side effects
         node.inputs.forEach(::addEdge)
         node.outputs.forEach(::addEdge)
         nodeMap[node.id] = node
         return node
     }
 
-    fun findTopLevelStatements() = nodeMap.filterValues { it is Nodes.StatementNode && it.inputs.isEmpty() }.values
+//    fun findTopLevelStatements() = nodeMap.filterValues { it is Nodes.StatementNode && it.inputs.isEmpty() }.values
 
     fun link(input: Edge, output: Edge, linkId: Int = ++nextLinkId) {
         if (!input.linkTo(output, linkId)) return
@@ -64,7 +64,7 @@ class Graph() : Serial {
                 if (input.links.containsKey(linkId)) {
                     val other = input.links[linkId]!!
                     input.unlink(linkId)
-                    val link = findByOutputId(other) ?: continue
+                    val link = findByOutputID(other) ?: continue
                     link.unlink(linkId)
                     linkMap.remove(linkId)
                 }
@@ -72,11 +72,14 @@ class Graph() : Serial {
         }
     }
 
-    fun findByPin(id: Int): Edge? = findByInputId(id) ?: findByOutputId(id)
-    fun findByOutputId(id: Int): Edge? = outputToNode[id]
-    fun findByInputId(id: Int): Edge? = inputToNode[id]
-    fun findByNodeId(id: Int): Node? = nodeMap[id]
+    fun findByEdge(id: Int): Edge? = findByInputID(id) ?: findByOutputID(id)
+    fun findByOutputID(id: Int): Edge? = outputToNode[id]
+    fun findByInputID(id: Int): Edge? = inputToNode[id]
+    fun findByNodeID(id: Int): Node? = nodeMap[id]
 
+    /**
+     * Removes a node from the graph, this will also remove all links to and from the node
+     */
     fun removeNode(nodeId: Int) {
         val node = nodeMap.remove(nodeId) ?: return
         node.unAttach()
@@ -92,7 +95,7 @@ class Graph() : Serial {
         for (node in nodes) {
             for (input in node.inputs) {
                 for (links in input.links) {
-                    link(links.key, input, findByOutputId(links.value) ?: continue)
+                    link(links.key, input, findByOutputID(links.value) ?: continue)
                 }
             }
         }
@@ -105,8 +108,8 @@ class Graph() : Serial {
     override fun CompoundTag.serialize() {
         putBoolean("hasMeta", meta != null)
         if (meta != null) putString("meta", meta!!)
-        putInt("nextNodeId", nextNodeId)
-        putInt("nextPinId", nextPinId)
+        putInt("nextNodeId", nextNodeID)
+        putInt("nextPinId", nextEdgeID)
         putInt("nextLinkId", nextLinkId)
         putDeepList("nodes", nodeMap.values.toList())
         val links = CompoundTag()
@@ -121,8 +124,8 @@ class Graph() : Serial {
 
     override fun CompoundTag.deserialize() {
         if (getBoolean("hasMeta")) meta = getString("meta")
-        nextNodeId = getInt("nextNodeId")
-        nextPinId = getInt("nextPinId")
+        nextNodeID = getInt("nextNodeId")
+        nextEdgeID = getInt("nextPinId")
         nextLinkId = getInt("nextLinkId")
         nodeMap.clear()
         outputToNode.clear()
@@ -133,8 +136,8 @@ class Graph() : Serial {
         val links = getCompound("links")
         val keys = links.getIntArray("keys")
         keys.forEachIndexed { index, linkId ->
-            val input = findByInputId(links.getInt("input_$index")) ?: return@forEachIndexed
-            val output = findByOutputId(links.getInt("output_$index")) ?: return@forEachIndexed
+            val input = findByInputID(links.getInt("input_$index")) ?: return@forEachIndexed
+            val output = findByOutputID(links.getInt("output_$index")) ?: return@forEachIndexed
             link(input, output, linkId)
         }
 
