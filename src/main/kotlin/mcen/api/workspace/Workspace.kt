@@ -6,7 +6,7 @@ import net.minecraft.nbt.CompoundTag
 /**
  * A virtual environment that will be stored per block entity instance.
  */
-class Workspace : Folder("root") {
+class Workspace : Folder("/") {
 
     /**
      * Reads a file from the virtual path
@@ -27,6 +27,7 @@ class Workspace : Folder("root") {
      * Writes a file to the virtual path, creating the folders if they don't exist
      */
     fun writeFile(path: String, source: String): File {
+        val path = if(path.startsWith("/")) path.substring(1) else path
         if (!path.contains("/")) return addFile(File(path, source))
         val split = path.split("/")
         var currentFolder: Folder = this

@@ -164,6 +164,8 @@ object Renderer {
         name: String,
         dockspace: Dockspace
     ) {
+
+
         val flags = ImGuiWindowFlags.NoNavFocus or
                 ImGuiWindowFlags.NoTitleBar or
                 ImGuiWindowFlags.NoCollapse or
@@ -185,23 +187,28 @@ object Renderer {
         if (node == null || node.ptr == 0L || node.id == 0) //Null ptr? it we should now create?
             createDock(name, dockspace.viewports)
         dockspaceID = ImGui.getID(name)
-        ImGui.pushStyleVar(ImGuiStyleVar.WindowMinSize, 200f, 150f);
+        ImGui.pushStyleVar(ImGuiStyleVar.WindowMinSize, 225f, 225f);
         ImGui.dockSpace(dockspaceID, 0f, 0f, NoWindowMenuButton or NoCloseButton)
         ImGui.end()
         ImGui.popStyleVar()
 
         dockspace.viewports.forEach { viewport ->
-            ImGui.pushStyleVar(ImGuiStyleVar.WindowMinSize, 200f, 150f);
+            ImGui.pushStyleColor(ImGuiCol.MenuBarBg, 255.0f, 0.0f, 0.0f, 255.0f)
+            ImGui.pushStyleColor(ImGuiCol.Header, 255.0f, 0.0f, 0.0f, 255.0f)
+            ImGui.pushStyleColor(ImGuiCol.NavWindowingHighlight, 255.0f, 0.0f, 0.0f, 255.0f)
+            ImGui.pushStyleVar(ImGuiStyleVar.WindowMinSize, 225f, 225f);
             ImGui.begin(viewport.name, ImGuiWindowFlags.NoTitleBar)
             viewport.dockspace()
             ImGui.end()
             ImGui.popStyleVar()
-
+            ImGui.popStyleColor(3)
         }
-    dockspace.mainViewport.popup()
+
+        dockspace.mainViewport.popup()
         dockspace.viewports.forEach {
             it.popup()
         }
+
     }
 
 //    inline fun dockspace(

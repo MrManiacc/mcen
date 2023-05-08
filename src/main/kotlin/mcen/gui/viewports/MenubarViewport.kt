@@ -2,18 +2,20 @@ package mcen.gui.viewports
 
 import imgui.ImGui
 import imgui.ImVec2
-import imgui.flag.ImGuiCond
-import imgui.flag.ImGuiInputTextFlags
+import imgui.flag.*
 import imgui.type.ImString
 import mcen.api.workspace.File
 import mcen.api.workspace.Folder
 import mcen.api.workspace.Workspace
 import mcen.content.internal.Registry
 import mcen.content.internal.WorldPos
+import mcen.gui.Ico
 import mcen.gui.Icons
 import mcen.gui.Renderer
 import mcen.registry.net.CompileSource
 import mcen.registry.net.SyncWorkspacePacket
+import net.minecraft.client.Minecraft
+import org.lwjgl.glfw.GLFW.*
 import kotlin.random.Random
 
 class MenubarViewport(private val worldPos: WorldPos) : Viewport("menubar") {
@@ -35,6 +37,9 @@ class MenubarViewport(private val worldPos: WorldPos) : Viewport("menubar") {
                         Registry.Net.sendToServer(SyncWorkspacePacket(explorer.workspace, worldPos.position, worldPos.world))
                     }
 
+                }
+                menuItem("Show Paths", "", explorer.displayFullPaths) {
+                    explorer.displayFullPaths = !explorer.displayFullPaths
                 }
                 menuItem("ReadOnly", "", scripts.editor.isReadOnly) {
                     scripts.editor.isReadOnly = !scripts.editor.isReadOnly
@@ -62,10 +67,14 @@ class MenubarViewport(private val worldPos: WorldPos) : Viewport("menubar") {
                 }
 
             }
+
             ImGui.sameLine((ImGui.getWindowWidth() / 2) - ImGui.calcTextSize("editing: ${scripts.activeFile.name}.lua").x / 2);
             ImGui.text("editing: ${scripts.activeFile.name}.lua")
-            ImGui.sameLine(ImGui.getWindowWidth() - 180);
-            if (ImGui.button("Compile ${Icons.Sun}")) {
+            ImGui.sameLine(ImGui.getWindowWidth() - 270);
+            ImGui.pushStyleColor(ImGuiCol.Button, 45, 46, 46, 255)
+
+            if (ImGui.button("Save All ${Ico.ICON_SAVE_ALL}")) {
+                scripts.activeFile.sourceCode = scripts.editor.text
                 Registry.Net.sendToServer(
                     SyncWorkspacePacket(
                         explorer.workspace,
@@ -73,6 +82,20 @@ class MenubarViewport(private val worldPos: WorldPos) : Viewport("menubar") {
                         worldPos.world
                     )
                 )
+            }
+            if(ImGui.isItemHovered())
+                 ImGui.setTooltip("Saves current workspace on the server")
+
+
+            if (ImGui.button("Clear ${Ico.ICON_CLEAR_ALL}")) {
+                scripts.messages.clear()
+                scripts.errors.clear()
+            }
+            if(ImGui.isItemHovered())
+                ImGui.setTooltip("Clear all messages and errors")
+            ImGui.sameLine()
+
+            if (ImGui.button("Run ${Ico.ICON_DEBUG_START}")) {
                 scripts.activeFile.sourceCode = scripts.editor.text
                 Registry.Net.sendToServer(
                     CompileSource(
@@ -82,13 +105,27 @@ class MenubarViewport(private val worldPos: WorldPos) : Viewport("menubar") {
                     )
                 )
                 scripts.errors.clear()
-
             }
-            ImGui.sameLine()
-            if (ImGui.button("Clear ${Icons.HandPointDown}")) {
-                scripts.messages.clear()
-                scripts.errors.clear()
+            if(ImGui.isItemHovered())
+                ImGui.setTooltip("Sends script to be compiled/ran server-side")
+            ImGui.popStyleColor()
 
+        }
+        glfwGetKey(Minecraft.getInstance().window.window, GLFW_KEY_J).let { sKey ->
+            if(sKey == GLFW_PRESS && glfwGetKey(Minecraft.getInstance().window.window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS){
+                action = "new"
+                explorer.newContext = scripts.activeFile.parent
+            }
+        }
+
+        glfwGetKey(Minecraft.getInstance().window.window, GLFW_KEY_S).let {sKey->
+            if(sKey == GLFW_PRESS && glfwGetKey(Minecraft.getInstance().window.window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS){
+                if (scripts.activeFile == File.InvalidFile) {
+                    action = "save"
+                } else {
+                    scripts.activeFile.sourceCode = scripts.editor.text
+                    Registry.Net.sendToServer(SyncWorkspacePacket(explorer.workspace, worldPos.position, worldPos.world))
+                }
             }
         }
 
@@ -96,7 +133,6 @@ class MenubarViewport(private val worldPos: WorldPos) : Viewport("menubar") {
             ImGui.openPopup("${action}_action")
             action = ""
         }
-
 
     }
 

@@ -9,6 +9,7 @@ import imgui.type.ImInt
 import mcen.content.ControllerScreen
 import mcen.content.internal.Registry
 import mcen.content.internal.WorldPos
+import mcen.gui.Ico
 import mcen.gui.Icons
 import mcen.gui.Renderer
 import mcen.registry.net.CompileSource
@@ -62,7 +63,7 @@ class ConsoleViewport(private val worldPos: WorldPos) : Viewport("console") {
             scripts.editor.setErrorMarkers(emptyMap())
         }
 //        menuBar {
-        ImGui.pushStyleColor(ImGuiCol.Button, 45, 46, 46, 255)
+//        ImGui.pushStyleColor(ImGuiCol.Button, 45, 46, 46, 255)
 //        ImGui.checkbox("Compile node graph", compileGraph)
 ////        if (ImGui.button("Compile ${Icons.Sun}")) {
 ////            //Send the compile node source delegation to the node viewport
@@ -73,11 +74,11 @@ class ConsoleViewport(private val worldPos: WorldPos) : Viewport("console") {
 ////                Registry.Net.sendToServer(CompileSource(worldPos.position, worldPos.world, scripts.editor.text))
 ////            }
 ////        }
-        ImGui.sameLine()
-        if (ImGui.button("Clear ${Icons.HandPointDown}")) {
-            scripts.messages.clear()
-        }
-        ImGui.popStyleColor()
+//        ImGui.sameLine()
+//        if (ImGui.button("Clear ${Ico.ICON_DEBUG_BREAKPOINT_LOG}")) {
+//            scripts.messages.clear()
+//        }
+//        ImGui.popStyleColor()
 //        }
         if (ImGui.beginChild("console")) {
             for (message in scripts.messages) {

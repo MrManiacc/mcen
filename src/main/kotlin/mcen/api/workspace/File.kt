@@ -6,6 +6,10 @@ import net.minecraft.nbt.CompoundTag
 
 class File(var name: String = "", var sourceCode: String = "") : Serial {
 
+    var parent: Folder? = null
+
+    val path:String get() =  "${parent?.path ?: ""}/$name"
+
     override fun CompoundTag.deserialize() {
         name = getString("name")
         sourceCode = getString("sourceCode")

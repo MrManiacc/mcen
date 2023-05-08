@@ -31,10 +31,10 @@ class ControllerScreen(level: Level, blockPos: BlockPos, private val controllerT
     //provides a reference to all the active viewports within the controller screen
     private val viewports = Dockspace(
         arrayListOf(
-            ScriptViewport(worldPos).apply {
+            NodeViewport(), ScriptViewport(worldPos).apply {
                 //Make sure to reset the text to what text is stored within the controller tile upon opening the screen
                 editor.textLines = controllerTile.scriptSource.trimIndent().split("\n").toTypedArray()
-            }, NodeViewport(), ConsoleViewport(worldPos),
+            }, ConsoleViewport(worldPos),
             ExplorerViewport(controllerTile.workspace, worldPos),
         ), MenubarViewport(worldPos)
     )

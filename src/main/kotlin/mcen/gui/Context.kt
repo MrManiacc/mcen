@@ -63,33 +63,33 @@ class RenderContext(private val backend: RendererBackend) {
         style.windowRounding = 5.0f
         style.frameBorderSize = 2.5f
         ImGui.styleColorsDark()
-        style.colors[ImGuiCol.FrameBg] = floatArrayOf(51f / 255f, 51f / 255f, 50f / 255f, 255f / 255f)
-        style.colors[ImGuiCol.Tab] = floatArrayOf(117 / 255f, 70 / 255f, 153 / 255f, 255f / 255f)
-        style.colors[ImGuiCol.TabActive] = floatArrayOf(130f / 255f, 68 / 255f, 178 / 255f, 255f / 255f)
-        style.colors[ImGuiCol.FrameBg] = floatArrayOf(130f / 255f, 68 / 255f, 178 / 255f, 255f / 255f)
-        style.colors[ImGuiCol.TabHovered] = floatArrayOf(87 / 255f, 37 / 255f, 125 / 255f, 255f / 255f)
-        style.colors[ImGuiCol.FrameBgActive] = floatArrayOf(87 / 255f, 37 / 255f, 125 / 255f, 255f / 255f)
-        style.colors[ImGuiCol.FrameBgHovered] = floatArrayOf(87 / 255f, 37 / 255f, 125 / 255f, 255f / 255f)
-        style.colors[ImGuiCol.Button] = floatArrayOf(79 / 255f, 37 / 255f, 121 / 255f, 255f / 255f)
-        style.colors[ImGuiCol.ButtonActive] = floatArrayOf(92 / 255f, 45 / 255f, 130 / 255f, 255f / 255f)
-        style.colors[ImGuiCol.ButtonHovered] = floatArrayOf(79 / 255f, 37 / 255f, 121 / 255f, 255f / 255f)
-        style.colors[ImGuiCol.TabUnfocused] = floatArrayOf(104 / 255f, 68 / 255f, 133 / 255f, 255f / 255f)
-        style.colors[ImGuiCol.TabUnfocusedActive] = floatArrayOf(117 / 255f, 70 / 255f, 153 / 255f, 255f / 255f)
-        style.colors[ImGuiCol.TitleBg] = floatArrayOf(70 / 255f, 69 / 255f, 71 / 255f, 255f / 255f)
-        style.colors[ImGuiCol.TitleBgActive] = floatArrayOf(89 / 255f, 87 / 255f, 90 / 255f, 255f / 255f)
-        style.colors[ImGuiCol.TitleBgCollapsed] = floatArrayOf(89 / 255f, 87 / 255f, 90 / 255f, 255f / 255f)
-        style.colors[ImGuiCol.NavHighlight] = floatArrayOf(89 / 255f, 87 / 255f, 90 / 255f, 255f / 255f)
-        style.colors[ImGuiCol.NavWindowingDimBg] = floatArrayOf(89 / 255f, 87 / 255f, 90 / 255f, 255f / 255f)
-        style.colors[ImGuiCol.NavWindowingHighlight] = floatArrayOf(89 / 255f, 87 / 255f, 90 / 255f, 255f / 255f)
-        style.colors[ImGuiCol.Header] = floatArrayOf(70 / 255f, 69 / 255f, 71 / 255f, 255f / 255f)
-        style.colors[ImGuiCol.HeaderActive] = floatArrayOf(89 / 255f, 87 / 255f, 90 / 255f, 255f / 255f)
-        style.colors[ImGuiCol.HeaderHovered] = floatArrayOf(89 / 255f, 87 / 255f, 90 / 255f, 255f / 255f)
-        style.colors[ImGuiCol.MenuBarBg] = floatArrayOf(108 / 255f, 106 / 255f, 102 / 255f, 255f / 255f)
-        style.colors[ImGuiCol.Border] = floatArrayOf(108 / 255f, 106 / 255f, 102 / 255f, 255f / 255f)
-        style.colors[ImGuiCol.BorderShadow] = floatArrayOf(108 / 255f, 106 / 255f, 102 / 255f, 255f / 255f)
-        style.colors[ImGuiCol.DockingPreview] = floatArrayOf(108 / 255f, 106 / 255f, 102 / 255f, 255f / 255f)
-        style.colors[ImGuiCol.DockingEmptyBg] = floatArrayOf(89 / 255f, 87 / 255f, 90 / 255f, 255f / 255f)
-        style.colors[ImGuiCol.WindowBg] = floatArrayOf(89 / 255f, 87 / 255f, 90 / 255f, 255f / 255f)
+        style.colors[ImGuiCol.FrameBg] = floatArrayOf(51f, 51f, 50f, 255f)
+        style.colors[ImGuiCol.Tab] = floatArrayOf(117f, 70f, 153f, 255f)
+        style.colors[ImGuiCol.TabActive] = floatArrayOf(130f, 68f, 178f, 255f)
+        style.colors[ImGuiCol.FrameBg] = floatArrayOf(130f, 68f, 178f, 255f)
+        style.colors[ImGuiCol.TabHovered] = floatArrayOf(87f, 37f, 125f, 255f)
+        style.colors[ImGuiCol.FrameBgActive] = floatArrayOf(87f, 37f, 125f, 255f)
+        style.colors[ImGuiCol.FrameBgHovered] = floatArrayOf(87f, 37f, 125f, 255f)
+        style.colors[ImGuiCol.Button] = floatArrayOf(79f, 37f, 121f, 255f)
+        style.colors[ImGuiCol.ButtonActive] = floatArrayOf(92f, 45f, 130f, 255f)
+        style.colors[ImGuiCol.ButtonHovered] = floatArrayOf(79f, 37f, 121f, 255f)
+        style.colors[ImGuiCol.TabUnfocused] = floatArrayOf(104f, 68f, 133f, 255f)
+        style.colors[ImGuiCol.TabUnfocusedActive] = floatArrayOf(117f, 70f, 153f, 255f)
+        style.colors[ImGuiCol.TitleBg] = floatArrayOf(70f, 69f, 71f, 255f)
+        style.colors[ImGuiCol.TitleBgActive] = floatArrayOf(89f, 87f, 90f, 255f)
+        style.colors[ImGuiCol.TitleBgCollapsed] = floatArrayOf(89f, 87f, 90f, 255f)
+        style.colors[ImGuiCol.NavHighlight] = floatArrayOf(89f, 87f, 90f, 255f)
+        style.colors[ImGuiCol.NavWindowingDimBg] = floatArrayOf(89f, 87f, 90f, 255f)
+        style.colors[ImGuiCol.NavWindowingHighlight] = floatArrayOf(89f, 87f, 90f, 255f)
+        style.colors[ImGuiCol.Header] = floatArrayOf(70f, 69f, 71f, 255f)
+        style.colors[ImGuiCol.HeaderActive] = floatArrayOf(89f, 87f, 90f, 255f)
+        style.colors[ImGuiCol.HeaderHovered] = floatArrayOf(89f, 87f, 90f, 255f)
+        style.colors[ImGuiCol.MenuBarBg] = floatArrayOf(108f, 106f, 102f, 255f)
+        style.colors[ImGuiCol.Border] = floatArrayOf(108f, 106f, 102f, 255f)
+        style.colors[ImGuiCol.BorderShadow] = floatArrayOf(108f, 106f, 102f, 255f)
+        style.colors[ImGuiCol.DockingPreview] = floatArrayOf(108f, 106f, 102f, 255f)
+        style.colors[ImGuiCol.DockingEmptyBg] = floatArrayOf(89f, 87f, 90f, 255f)
+        style.colors[ImGuiCol.WindowBg] = floatArrayOf(89f, 87f, 90f, 255f)
         style.tabBorderSize = 5f
         style.tabRounding = 0f
     }
@@ -110,21 +110,28 @@ class RenderContext(private val backend: RendererBackend) {
         val rangesBuilder = ImFontGlyphRangesBuilder() // Glyphs ranges provide
         rangesBuilder.addRanges(io.fonts.glyphRangesDefault)
         rangesBuilder.addRanges(Icons.IconRange);
+        rangesBuilder.addRanges(Ico.ICON_RANGE);
         val glyphRanges = rangesBuilder.buildRanges()
         val defaultConfig = ImFontConfig()
         defaultConfig.mergeMode = false
-        io.fonts.addFontFromMemoryTTF(loadFromResources("futura light bt.ttf"), 20f, defaultConfig, glyphRanges)
+        io.fonts.addFontFromMemoryTTF(loadFromResources("futura light bt.ttf"), 21f, defaultConfig, glyphRanges)
         val iconFont = ImFontConfig()
         iconFont.mergeMode = true
         io.fonts.addFontFromMemoryTTF(
             loadFromResources("Font Awesome 6 Free-Regular-400.otf"),
-            17f,
+            16f,
+            iconFont,
+            glyphRanges
+        )
+        io.fonts.addFontFromMemoryTTF(
+            loadFromResources("codicon.ttf"),
+            16f,
             iconFont,
             glyphRanges
         )
         val codeConfig = ImFontConfig()
         codeConfig.mergeMode = false
-        this.codeFont = io.fonts.addFontFromMemoryTTF(loadFromResources("SourceCodePro-Regular.ttf"), 18f, defaultConfig, glyphRanges)
+        this.codeFont = io.fonts.addFontFromMemoryTTF(loadFromResources("SourceCodePro-Regular.ttf"), 19f, defaultConfig, glyphRanges)
 //        io.fonts.addFont(codeConfig)
 //        io.fonts.addFont(iconFont)
         io.fonts.addFontDefault(defaultConfig)
